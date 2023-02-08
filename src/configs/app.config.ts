@@ -1,5 +1,5 @@
 export const appConfig = {
   api: {
-    url: "http://localhost:3000/api",
+    url: Number(process.env.REACT_APP_IS_PROD) ? "https://insta-manager.ikurochkin.com/api" : "http://localhost:3000/api",
   },
 };
