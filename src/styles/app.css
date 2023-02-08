@@ -1,0 +1,19 @@
+body {
+    margin: 0;
+}
+
+h1,h2,h3,h4,h5 {
+    margin: 0!important;
+    padding: 0!important;
+}
+
+.
+.ant-list-item {
+    transition: all 0.3s;
+}
+
+.ant-list-item:hover {
+    -webkit-box-shadow: 0px 4px 18px -10px rgba(0,0,0,0.75)!important;
+    -moz-box-shadow: 0px 4px 18px -10px rgba(0,0,0,0.75)!important;
+    box-shadow: 0px 4px 18px -10px rgba(0,0,0,0.75)!important;
+}
