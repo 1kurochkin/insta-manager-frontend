@@ -1,4 +1,5 @@
 export const appConfig = {
-    api: '',
-
-}
+  api: {
+    url: "http://localhost:3000/api",
+  },
+};
