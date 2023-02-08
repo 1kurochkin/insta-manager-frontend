@@ -1,24 +1,23 @@
 import { ArrowRightOutlined } from "@ant-design/icons";
 import {
-    Divider,
-    Form,
-    List,
-    Segmented,
-    Spin,
-    Typography,
-    notification
+  Col,
+  Divider,
+  Form,
+  List,
+  Row,
+  Segmented,
+  Spin,
+  Typography,
+  notification,
 } from "antd";
 import { useForm } from "antd/es/form/Form";
 import Search from "antd/es/input/Search";
 import { Content } from "antd/es/layout/layout";
-import {
-    useLazyGetUnfollowedQuery
-} from "./store/reducers/api/api.reducer";
+import { useLazyGetUnfollowedQuery } from "./store/reducers/api/api.reducer";
 import "./styles/app.css";
 
 function App() {
-  const [getUnfollowed, { data, isFetching }] =
-    useLazyGetUnfollowedQuery();
+  const [getUnfollowed, { data, isFetching }] = useLazyGetUnfollowedQuery();
 
   const [searchForm] = useForm();
   const { unfollowed_list, user_info } = data || {};
@@ -26,12 +25,20 @@ function App() {
     user_info || {};
 
   const onSearchHandler = async () => {
-      try {
-        const {username} = await searchForm.validateFields();
-        getUnfollowed(username);
-      } catch {
-        notification.error({message: 'Please put the username please!'})
-      }
+    try {
+      const { username } = await searchForm.validateFields();
+      getUnfollowed(username);
+    } catch {
+      notification.error({ message: "Please put the username please!" });
+    }
+  };
+
+  const onClickHandler = (username: string) => {
+    window.open(
+      `https://www.instagram.com/${username}`,
+      "_blank",
+      "noreferrer"
+    );
   };
 
   return (
@@ -73,18 +80,16 @@ function App() {
             >
               <Search
                 addonBefore={
-                  <Typography.Title level={4}>
-                    https://www.instagram.com/
-                  </Typography.Title>
+                  <Typography.Title level={5}>Username:</Typography.Title>
                 }
-                placeholder="Put here an username"
+                placeholder="e.g. jhon777"
                 allowClear
                 loading={isFetching}
-                enterButton="Get Unfollowed"
+                enterButton="Get"
                 disabled={false}
                 size="large"
                 onSearch={onSearchHandler}
-                style={{ width: "70%", outline: "none", borderRadius: 10 }}
+                style={{ borderRadius: 10 }}
               />
             </Form.Item>
           </Form>
@@ -113,16 +118,17 @@ function App() {
                 dataSource={unfollowed_list}
                 renderItem={(item) => (
                   <List.Item
+                    onClick={() => onClickHandler(item.username)}
                     style={{
                       marginBottom: 10,
-                      background: "white",
                       borderRadius: 10,
                       cursor: "pointer",
-                      
                     }}
                     key={item.username}
                   >
-                    <List.Item.Meta style={{color: 'white'}} description={`Username: ${item.username} | Full name: ${item.full_name}`}/>
+                    <List.Item.Meta
+                      description={`${item.username}  |  ${item.full_name}`}
+                    />
                     <ArrowRightOutlined />
                   </List.Item>
                 )}
