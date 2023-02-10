@@ -1,141 +1,76 @@
-import { ArrowRightOutlined } from "@ant-design/icons";
-import {
-  Col,
-  Divider,
-  Form,
-  List,
-  Row,
-  Segmented,
-  Spin,
-  Typography,
-  notification,
-} from "antd";
-import { useForm } from "antd/es/form/Form";
-import Search from "antd/es/input/Search";
-import { Content } from "antd/es/layout/layout";
+import { useRef } from "react";
+import List from "./components/list.component";
 import { useLazyGetUnfollowedQuery } from "./store/reducers/api/api.reducer";
 import "./styles/app.css";
 
 function App() {
-  const [getUnfollowed, { data, isFetching }] = useLazyGetUnfollowedQuery();
+  const [getUnfollowed, { data, isFetching, error: fetchError }] =
+    useLazyGetUnfollowedQuery();
+  const inputUsernameRef = useRef<HTMLInputElement>(null);
 
-  const [searchForm] = useForm();
-  const { unfollowed_list, user_info } = data || {};
-  const { unfollowed_count, followings_count, followers_count } =
+  const {
+    unfollowed_list = [],
+    user_info,
+  } = data || {};
+  const { unfollowed_count = "", followings_count = "", followers_count = "" } =
     user_info || {};
 
-  const onSearchHandler = async () => {
-    try {
-      const { username } = await searchForm.validateFields();
-      getUnfollowed(username);
-    } catch {
-      notification.error({ message: "Please put the username please!" });
+  const onClickGetButtonHandler = async () => {
+    const { value } = inputUsernameRef.current || {};
+    if (value) {
+      getUnfollowed(value);
+    } else {
+        alert("Please put an username!")
     }
   };
 
-  const onClickHandler = (username: string) => {
-    window.open(
-      `https://www.instagram.com/${username}`,
-      "_blank",
-      "noreferrer"
-    );
-  };
-
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        display: "flex",
-        justifyContent: "center",
-        background: "lightskyblue",
-      }}
-    >
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          width: "80%",
-        }}
-      >
-        <div
-          style={{
-            padding: 20,
-            background: "white",
-            textAlign: "center",
-            height: "unset",
-            borderRadius: 10,
-            marginTop: 10,
-          }}
-        >
-          <Typography.Title>Unfollowed</Typography.Title>
-          <Typography.Paragraph style={{ fontSize: 18 }}>
-            Here is you can get list of people that you are following to, but
-            they dont follow back
-          </Typography.Paragraph>
-          <Form form={searchForm}>
-            <Form.Item
-              name={"username"}
-              rules={[{ required: true, message: "" }]}
+    <div className="bg-background color text-primary min-h-screen flex justify-center text-xl py-10">
+      <div className="flex flex-col md:w-10/12 w-11/12">
+        <div className="w-full flex flex-col border-b-2 border-double pb-10">
+          <div className="mb-10">
+            <h1 className="text-secondary text-3xl font-bold text-center mt-5">
+              Unfollowed
+            </h1>
+            <p className="text-center">
+              Here is you can get list of people that you are following to, but
+              they dont follow back
+            </p>
+          </div>
+          <div className="flex flex-wrap justify-between w-full">
+            <input
+              ref={inputUsernameRef}
+              className="sm:basis-full hover:border-secondary active:border-secondary basis-8/12 bg-inherit text-primary rounded-md p-2 border-2 border-dashed border-white"
+              placeholder="Username e.g jhon11"
+            />
+            <button
+              onClick={onClickGetButtonHandler}
+              className="hover:text-secondary sm:w-full sm:ml-0 sm:mt-5 ml-5 sm:py-2 grow px-10 border-2 rounded-md border-secondary border-dashed"
             >
-              <Search
-                addonBefore={
-                  <Typography.Title level={5}>Username:</Typography.Title>
-                }
-                placeholder="e.g. jhon777"
-                allowClear
-                loading={isFetching}
-                enterButton="Get"
-                disabled={false}
-                size="large"
-                onSearch={onSearchHandler}
-                style={{ borderRadius: 10 }}
-              />
-            </Form.Item>
-          </Form>
+              Get
+            </button>
+          </div>
         </div>
-        <Content style={{ height: "100%" }}>
+        <div className="w-full">
           {isFetching ? (
-            <Spin style={{ marginTop: 50 }} tip="Loading" size="large">
-              <div />
-            </Spin>
+            <div className="animate-pulse text-secondary text-3xl font-bold text-center mt-10">
+              0 1 0 1 0 1 1 1 0
+            </div>
+          ) : fetchError ? (
+            <div className="animate-pulse text-red-500 text-xl font-bold text-center mt-10">
+              Something went wrong! Please, try it later.
+            </div>
           ) : (
-            <>
-              <Divider />
-              <Segmented
-                disabled={true}
-                style={{ background: "white", cursor: "unset", color: "black" }}
-                block
-                size="large"
-                options={[
-                  `Followers: ${followers_count || "0"}`,
-                  `Followings: ${followings_count || "0"}`,
-                  `Unfollowed: ${unfollowed_count || "0"}`,
-                ]}
-              />
-              <Divider />
-              <List
-                dataSource={unfollowed_list}
-                renderItem={(item) => (
-                  <List.Item
-                    onClick={() => onClickHandler(item.username)}
-                    style={{
-                      marginBottom: 10,
-                      borderRadius: 10,
-                      cursor: "pointer",
-                    }}
-                    key={item.username}
-                  >
-                    <List.Item.Meta
-                      description={`${item.username}  |  ${item.full_name}`}
-                    />
-                    <ArrowRightOutlined />
-                  </List.Item>
-                )}
-              />
-            </>
+            <div className="flex flex-col items-center justify-center">
+              <div className=" text-center w-full py-5 mb-2 flex flex-wrap sm:justify-center justify-between border-b-2 border-double sm:text-xl">
+                <span className="text-secondary sm:basis-full">Followers: {followers_count}</span>
+                <span className="text-secondary sm:basis-full">Followings: {followings_count}</span>
+                <span className="text-secondary sm:basis-full">Unfollowed: {unfollowed_count}</span>
+              </div>
+              <List data={unfollowed_list || []} />
+            </div>
           )}
-        </Content>
+        </div>
       </div>
     </div>
   );
